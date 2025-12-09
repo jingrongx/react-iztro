@@ -1,9 +1,14 @@
 import { useState } from 'react';
 import { Iztrolabe } from 'react-iztro';
+import { astro } from 'iztro';
 import Header from './components/Header';
 import InputForm from './components/InputForm';
+import AISettings from './components/AISettings';
+import AIInterpretation from './components/AIInterpretation';
 import dayjs from 'dayjs';
 import './ziwei-theme.css';
+import { isConfigured } from './services/aiConfig';
+import { interpretAstrolabe } from './services/deepseekService';
 
 function App() {
   const [astrolabeData, setAstrolabeData] = useState({
@@ -14,6 +19,17 @@ function App() {
     leap: false,
   });
 
+  const [showSettings, setShowSettings] = useState(false);
+  const [showInterpretation, setShowInterpretation] = useState(false);
+  const [aiResult, setAiResult] = useState({
+    content: '',
+    reasoning: '',
+    isLoading: false,
+    error: '',
+  });
+
+
+
   const handleFormSubmit = (data: any) => {
     setAstrolabeData({
       date: data.date,
@@ -22,6 +38,57 @@ function App() {
       dateType: data.dateType,
       leap: data.leap,
     });
+  };
+
+  const handleAIInterpret = async () => {
+    // 检查是否已配置API密钥
+    if (!isConfigured()) {
+      alert('请先在设置中配置DeepSeek API密钥');
+      setShowSettings(true);
+      return;
+    }
+
+    // 显示解读对话框并开始加载
+    setShowInterpretation(true);
+    setAiResult({
+      content: '',
+      reasoning: '',
+      isLoading: true,
+      error: '',
+    });
+
+    try {
+      // 使用iztro直接生成astrolabe数据
+      const inputDate = dayjs(astrolabeData.date).format('YYYY-MM-DD');
+      const astrolabeInstance = astrolabeData.dateType === 'solar'
+        ? astro.bySolar(inputDate, astrolabeData.time, astrolabeData.gender)
+        : astro.byLunar(inputDate, astrolabeData.time, astrolabeData.gender, astrolabeData.leap);
+
+      // 生成运势数据
+      const horoscopeInstance = astrolabeInstance.horoscope(new Date(), 0);
+
+      // 调用AI服务进行解读
+      const result = await interpretAstrolabe({
+        astrolabeData: {
+          astrolabe: astrolabeInstance,
+          horoscope: horoscopeInstance,
+        },
+      });
+
+      setAiResult({
+        content: result.content,
+        reasoning: result.reasoning || '',
+        isLoading: false,
+        error: '',
+      });
+    } catch (error) {
+      setAiResult({
+        content: '',
+        reasoning: '',
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'AI解读失败',
+      });
+    }
   };
 
   return (
@@ -40,8 +107,29 @@ function App() {
             />
           </div>
         </div>
-        <InputForm onSubmit={handleFormSubmit} />
+        <InputForm
+          onSubmit={handleFormSubmit}
+          onAIInterpret={handleAIInterpret}
+          onOpenSettings={() => setShowSettings(true)}
+        />
       </main>
+
+      {/* AI设置对话框 */}
+      <AISettings
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+      />
+
+      {/* AI解读结果对话框 */}
+      {showInterpretation && (
+        <AIInterpretation
+          content={aiResult.content}
+          reasoning={aiResult.reasoning}
+          isLoading={aiResult.isLoading}
+          error={aiResult.error}
+          onClose={() => setShowInterpretation(false)}
+        />
+      )}
     </div>
   );
 }

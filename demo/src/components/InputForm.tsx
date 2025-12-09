@@ -1,11 +1,13 @@
-import { Calendar, ChevronDown, Download, Maximize2, Save, Settings } from 'lucide-react';
+import { Calendar, ChevronDown, Download, Maximize2, Save, Settings, Sparkles } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface InputFormProps {
     onSubmit: (data: any) => void;
+    onAIInterpret?: () => void;
+    onOpenSettings?: () => void;
 }
 
-export default function InputForm({ onSubmit }: InputFormProps) {
+export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings }: InputFormProps) {
     const [formData, setFormData] = useState({
         dateType: 'solar', // solar or lunar
         date: '1987-11-13',
@@ -156,7 +158,10 @@ export default function InputForm({ onSubmit }: InputFormProps) {
             </form>
 
             <div className="mt-8 grid grid-cols-4 gap-4">
-                <button className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors">
+                <button
+                    onClick={onOpenSettings}
+                    className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors"
+                >
                     <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/30">
                         <Settings size={18} />
                     </div>
@@ -181,6 +186,15 @@ export default function InputForm({ onSubmit }: InputFormProps) {
                     <span>保存</span>
                 </button>
             </div>
+
+            {/* AI解读按钮 */}
+            <button
+                onClick={onAIInterpret}
+                className="mt-4 w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg font-medium transition-all shadow-lg shadow-purple-200 dark:shadow-purple-900/20 flex items-center justify-center gap-2"
+            >
+                <Sparkles size={18} />
+                <span>AI 解读命盘</span>
+            </button>
         </div>
     );
 }
