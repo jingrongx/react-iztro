@@ -2,10 +2,5 @@ node_modules
 .git
 .gitignore
 README.md
-.eslintrc.json
-eslint.config.js
-tsconfig.json
-tsconfig.app.json
-tsconfig.node.json
 *.log
 .DS_Store
