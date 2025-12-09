@@ -54,7 +54,7 @@ react component of [iztro](https://github.com/SylarLong/iztro) used to generate 
 
   零配置快速集成到你的页面中，对于集成几乎没有学习成本。你可以根据自己的页面风格自行调整样式，或控制各个元素的显示与隐藏（通过覆盖默认样式）。
 
-集成到页面中的界面如下图所示。你也可以直接访问官方的 [紫微派斗数 AI解读版 - 紫微斗数在线排盘](https://react-iztro-nine.vercel.app/) 查看效果。
+集成到页面中的界面如下图所示。你也可以直接访问官方的 [紫微斗数 AI解读版 - 紫微斗数在线排盘](https://react-iztro-nine.vercel.app/) 查看效果。
 
 <img width="928" alt="react-iztro" src="https://github.com/SylarLong/react-iztro/assets/6510425/2817bb0c-89b5-4f33-ac5c-75481ad33209">
 
