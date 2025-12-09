@@ -77,6 +77,17 @@ export default function InputForm({ onSubmit }: InputFormProps) {
                         />
                         <Calendar className="absolute left-3 top-2.5 text-gray-400" size={16} />
                     </div>
+                    {formData.dateType === 'lunar' && (
+                        <label className="flex items-center gap-2 cursor-pointer mt-2">
+                            <input
+                                type="checkbox"
+                                checked={formData.leap}
+                                onChange={(e) => setFormData({ ...formData, leap: e.target.checked })}
+                                className="text-purple-600 focus:ring-purple-500 rounded"
+                            />
+                            <span className="text-sm text-gray-700 dark:text-gray-300">闰月</span>
+                        </label>
+                    )}
                 </div>
 
                 <div className="space-y-2">

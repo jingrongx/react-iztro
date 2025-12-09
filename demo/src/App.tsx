@@ -11,6 +11,7 @@ function App() {
     time: 7,
     gender: 'male' as 'male' | 'female',
     dateType: 'solar' as 'solar' | 'lunar',
+    leap: false,
   });
 
   const handleFormSubmit = (data: any) => {
@@ -19,6 +20,7 @@ function App() {
       time: data.time,
       gender: data.gender,
       dateType: data.dateType,
+      leap: data.leap,
     });
   };
 
@@ -33,6 +35,7 @@ function App() {
               birthTime={astrolabeData.time}
               gender={astrolabeData.gender}
               birthdayType={astrolabeData.dateType}
+              isLeapMonth={astrolabeData.leap}
               horoscopeDate={dayjs(astrolabeData.date).toDate()}
             />
           </div>
