@@ -45,30 +45,53 @@ export function buildPrompt(astrolabeData: any, focusArea?: string): string {
     prompt += `- 命主: ${astrolabe?.soul} | 身主: ${astrolabe?.body}\n`;
     prompt += `- 命宫位置: ${astrolabe?.earthlyBranchOfSoulPalace}宫 | 身宫位置: ${astrolabe?.earthlyBranchOfBodyPalace}宫\n\n`;
 
+    // 三方四正 (命宫)
+    if (astrolabe?.palaces) {
+        const getPalaceByName = (name: string) => astrolabe.palaces.find((p: any) => p.name === name);
+        const ming = getPalaceByName('命宫');
+        const caibo = getPalaceByName('财帛');
+        const guanlu = getPalaceByName('官禄');
+        const qianyi = getPalaceByName('迁移');
+
+        if (ming && caibo && guanlu && qianyi) {
+            prompt += `## 📐 三方四正 (命宫核心格局)\n`;
+            prompt += `这是命盘最核心的结构(三角形+对角线)，请重点分析：\n`;
+            const formatStarsSimple = (p: any) => {
+                const majors = p.majorStars?.map((s: any) => `${s.name}${s.brightness ? `[${s.brightness}]` : ''}`).join(',') || '(空宫)';
+                return majors;
+            };
+            prompt += `- [本宫] 命宫 (${ming.heavenlyStem}${ming.earthlyBranch}): ${formatStarsSimple(ming)}\n`;
+            prompt += `- [对宫] 迁移 (${qianyi.heavenlyStem}${qianyi.earthlyBranch}): ${formatStarsSimple(qianyi)}\n`;
+            prompt += `- [三合] 财帛 (${caibo.heavenlyStem}${caibo.earthlyBranch}): ${formatStarsSimple(caibo)}\n`;
+            prompt += `- [三合] 官禄 (${guanlu.heavenlyStem}${guanlu.earthlyBranch}): ${formatStarsSimple(guanlu)}\n\n`;
+        }
+    }
+
     // 十二宫信息
     if (astrolabe?.palaces) {
         prompt += `## 🏰 十二宫详细配置\n`;
         astrolabe.palaces.forEach((palace: any, index: number) => {
             prompt += `\n### 【${palace.name}宫】 (地支:${palace.earthlyBranch} | 天干:${palace.heavenlyStem})\n`;
 
+            // 格式化星曜显示 helper
+            const formatStar = (s: any) => `${s.name}${s.mutagen ? `(${s.mutagen})` : ''}${s.brightness ? `[${s.brightness}]` : ''}`;
+
             // 主星
             const majorStars = palace.majorStars || [];
             if (majorStars.length > 0) {
-                prompt += `🔴 主星: ${majorStars.map((s: any) =>
-                    `${s.name}${s.mutagen ? `(${s.mutagen})` : ''}${s.brightness ? `[${s.brightness}]` : ''}`
-                ).join(', ')}\n`;
+                prompt += `🔴 主星: ${majorStars.map(formatStar).join(', ')}\n`;
             } else {
                 prompt += `🔴 主星: (空宫)\n`;
             }
 
             // 辅星
             if (palace.minorStars?.length > 0) {
-                prompt += `🔵 辅星: ${palace.minorStars.map((s: any) => s.name).join(', ')}\n`;
+                prompt += `🔵 辅星: ${palace.minorStars.map(formatStar).join(', ')}\n`;
             }
 
             // 杂曜
             if (palace.adjectiveStars?.length > 0) {
-                prompt += `⚪ 杂曜: ${palace.adjectiveStars.map((s: any) => s.name).join(', ')}\n`;
+                prompt += `⚪ 杂曜: ${palace.adjectiveStars.map(formatStar).join(', ')}\n`;
             }
 
             // 神煞/流曜 (包括原局神煞 + 大限/流年流曜)
@@ -85,20 +108,30 @@ export function buildPrompt(astrolabeData: any, focusArea?: string): string {
                 if (horoscope.decadal?.stars?.[index]) {
                     const decStars = horoscope.decadal.stars[index];
                     if (decStars.length > 0) {
-                        otherStars.push(`大限流曜: ` + decStars.map((s: any) => s.name).join(','));
+                        otherStars.push(`大限流曜: ` + decStars.map(formatStar).join(','));
                     }
                 }
                 // 流年流曜
                 if (horoscope.yearly?.stars?.[index]) {
                     const yearStars = horoscope.yearly.stars[index];
                     if (yearStars.length > 0) {
-                        otherStars.push(`流年流曜: ` + yearStars.map((s: any) => s.name).join(','));
+                        otherStars.push(`流年流曜: ` + yearStars.map(formatStar).join(','));
                     }
                 }
             }
 
             if (otherStars.length > 0) {
                 prompt += `✨ 其他神煞: ${otherStars.join(' | ')}\n`;
+            }
+
+            // 小限与大限时间 (对应UI显示)
+            if (palace.ages || palace.decadal) {
+                const limits = [];
+                if (palace.ages) limits.push(`小限: ${palace.ages.join(' ')}`);
+                if (typeof palace.decadal === 'number') limits.push(`大限: ${palace.decadal} - ${palace.decadal + 9}`);
+                if (limits.length > 0) {
+                    prompt += `📅 运限时间: ${limits.join(' | ')}\n`;
+                }
             }
         });
     }
