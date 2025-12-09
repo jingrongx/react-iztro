@@ -48,7 +48,7 @@ export function buildPrompt(astrolabeData: any, focusArea?: string): string {
     // 十二宫信息
     if (astrolabe?.palaces) {
         prompt += `## 🏰 十二宫详细配置\n`;
-        astrolabe.palaces.forEach((palace: any) => {
+        astrolabe.palaces.forEach((palace: any, index: number) => {
             prompt += `\n### 【${palace.name}宫】 (地支:${palace.earthlyBranch} | 天干:${palace.heavenlyStem})\n`;
 
             // 主星
@@ -71,12 +71,31 @@ export function buildPrompt(astrolabeData: any, focusArea?: string): string {
                 prompt += `⚪ 杂曜: ${palace.adjectiveStars.map((s: any) => s.name).join(', ')}\n`;
             }
 
-            // 神煞/流曜 (如果数据中有)
+            // 神煞/流曜 (包括原局神煞 + 大限/流年流曜)
             const otherStars = [];
+            // 原局神煞
             if (palace.changsheng12) otherStars.push(`长生12:${palace.changsheng12}`);
             if (palace.boshi12) otherStars.push(`博士12:${palace.boshi12}`);
             if (palace.jiangqian12) otherStars.push(`将前12:${palace.jiangqian12}`);
             if (palace.suiqian12) otherStars.push(`岁前12:${palace.suiqian12}`);
+
+            // 运限流曜 (从horoscope中获取)
+            if (horoscope) {
+                // 大限流曜
+                if (horoscope.decadal?.stars?.[index]) {
+                    const decStars = horoscope.decadal.stars[index];
+                    if (decStars.length > 0) {
+                        otherStars.push(`大限流曜: ` + decStars.map((s: any) => s.name).join(','));
+                    }
+                }
+                // 流年流曜
+                if (horoscope.yearly?.stars?.[index]) {
+                    const yearStars = horoscope.yearly.stars[index];
+                    if (yearStars.length > 0) {
+                        otherStars.push(`流年流曜: ` + yearStars.map((s: any) => s.name).join(','));
+                    }
+                }
+            }
 
             if (otherStars.length > 0) {
                 prompt += `✨ 其他神煞: ${otherStars.join(' | ')}\n`;
@@ -90,14 +109,16 @@ export function buildPrompt(astrolabeData: any, focusArea?: string): string {
         prompt += `### 当前大限 (10年运)\n`;
         prompt += `- 大限位置: ${horoscope.decadal.name}宫\n`;
         prompt += `- 大限时间: ${horoscope.decadal.range?.join(' - ') || ''} (虚岁)\n`;
-        prompt += `- 大限四化: ${horoscope.decadal.mutagens?.join(', ') || '无'}\n`; // 假设有大限四化数据，如果没有可能为空
+        prompt += `- 大限四化: ${horoscope.decadal.mutagens?.join(', ') || '无'}\n`;
     }
 
     if (horoscope?.yearly) {
         prompt += `\n### 当前流年 (1年运)\n`;
         prompt += `- 流年位置: ${horoscope.yearly.name}宫\n`;
-        prompt += `- 流年时间: ${horoscope.yearly.year}年\n`;
+        // horoscope.yearly.year 可能是undefined, 使用天干地支代替或标注当前时间
+        prompt += `- 流年时间: ${horoscope.yearly.heavenlyStem}${horoscope.yearly.earthlyBranch}年 (公历${new Date().getFullYear()}年)\n`;
         prompt += `- 命主虚岁: ${horoscope.age?.nominalAge}岁\n`;
+        prompt += `- 流年四化: ${horoscope.yearly.mutagen?.join(', ') || '无'}\n`;
     }
 
     if (focusArea) {
