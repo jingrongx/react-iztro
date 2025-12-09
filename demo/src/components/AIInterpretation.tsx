@@ -116,6 +116,7 @@ export default function AIInterpretation({
                                         </div>
                                     )}
                                 </div>
+                            )}
                             {/* Prompt Data Section */}
                             {promptData && (
                                 <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
