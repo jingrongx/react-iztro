@@ -20,6 +20,8 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-iztro": "^1.4.2",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "sass": "^1.95.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17"

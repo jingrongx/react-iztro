@@ -30,7 +30,7 @@ export function buildPrompt(astrolabeData: any, focusArea?: string): string {
 
     // 基本信息
     prompt += `## 基本信息\n`;
-    prompt += `- 性别: ${astrolabe?.gender === 'male' ? '男' : '女'}\n`;
+    prompt += `- 性别: ${['male', '男'].includes(astrolabe?.gender) ? '男' : '女'}\n`;
     prompt += `- 阳历生日: ${astrolabe?.solarDate}\n`;
     prompt += `- 农历生日: ${astrolabe?.lunarDate}\n`;
     prompt += `- 四柱: ${astrolabe?.chineseDate}\n`;

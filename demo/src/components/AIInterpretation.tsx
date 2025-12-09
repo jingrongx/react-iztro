@@ -1,5 +1,7 @@
 import { Sparkles, X, Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface AIInterpretationProps {
     content: string;
@@ -146,9 +148,20 @@ export default function AIInterpretation({
 
                             {/* 解读内容 */}
                             <div className="prose prose-sm dark:prose-invert max-w-none">
-                                <div className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
+                                <ReactMarkdown
+                                    remarkPlugins={[remarkGfm]}
+                                    components={{
+                                        // 自定义链接样式
+                                        a: ({ node, ...props }: any) => <a {...props} className="text-purple-600 dark:text-purple-400 hover:underline" target="_blank" rel="noopener noreferrer" />,
+                                        // 自定义表格样式
+                                        table: ({ node, ...props }: any) => <div className="overflow-x-auto my-4"><table {...props} className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" /></div>,
+                                        thead: ({ node, ...props }: any) => <thead {...props} className="bg-gray-50 dark:bg-gray-800" />,
+                                        th: ({ node, ...props }: any) => <th {...props} className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider" />,
+                                        td: ({ node, ...props }: any) => <td {...props} className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800" />,
+                                    }}
+                                >
                                     {content}
-                                </div>
+                                </ReactMarkdown>
                             </div>
 
                             {/* 免责声明 */}
