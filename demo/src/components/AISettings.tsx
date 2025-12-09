@@ -151,16 +151,22 @@ export default function AISettings({ isOpen, onClose }: AISettingsProps) {
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                             模型
                         </label>
-                        <select
-                            value={config.model}
-                            onChange={(e) => setConfig({ ...config, model: e.target.value })}
-                            className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                        >
-                            <option value="deepseek-reasoner">DeepSeek V3.2 思考模式 (推荐)</option>
-                            <option value="deepseek-chat">DeepSeek V3.2 非思考模式</option>
-                        </select>
+                        <div className="relative">
+                            <input
+                                list="model-options"
+                                type="text"
+                                value={config.model}
+                                onChange={(e) => setConfig({ ...config, model: e.target.value })}
+                                placeholder="输入或选择模型名称"
+                                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                            <datalist id="model-options">
+                                <option value="deepseek-reasoner">DeepSeek V3.2 思考模式 (推荐)</option>
+                                <option value="deepseek-chat">DeepSeek V3.2 非思考模式</option>
+                            </datalist>
+                        </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                            推荐使用思考模式,可查看AI的思考过程
+                            支持自定义模型名称。如使用其他服务商，请修改API地址。
                         </p>
                     </div>
 

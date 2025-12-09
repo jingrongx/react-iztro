@@ -45,18 +45,28 @@ function App() {
   const handleDownload = async () => {
     if (astrolabeRef.current) {
       try {
+        // 等待一小段时间确保DOM渲染完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         const canvas = await html2canvas(astrolabeRef.current, {
           useCORS: true,
+          allowTaint: true,
           scale: 2, // High resolution
-          backgroundColor: '#ffffff' // Ensure white background
+          backgroundColor: '#ffffff', // Ensure white background
+          logging: true, // Enable logging to debug
+          onclone: (document) => {
+            // 可以在这里处理克隆后的文档，比如修改样式
+            console.log('DOM cloned for capture');
+          }
         });
+
         const link = document.createElement('a');
         link.download = `ziwei-chart-${dayjs().format('YYYYMMDD-HHmmss')}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
       } catch (e) {
-        console.error('Download failed', e);
-        alert('下载失败，请重试');
+        console.error('Download failed detail:', e);
+        alert('下载失败，请重试。如果问题持续，请尝试使用系统自带截图工具。');
       }
     }
   };
