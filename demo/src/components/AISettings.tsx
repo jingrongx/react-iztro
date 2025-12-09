@@ -156,11 +156,11 @@ export default function AISettings({ isOpen, onClose }: AISettingsProps) {
                             onChange={(e) => setConfig({ ...config, model: e.target.value })}
                             className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
-                            <option value="deepseek-reasoner">DeepSeek Reasoner (推荐)</option>
-                            <option value="deepseek-chat">DeepSeek Chat</option>
+                            <option value="deepseek-reasoner">DeepSeek V3.2 思考模式 (推荐)</option>
+                            <option value="deepseek-chat">DeepSeek V3.2 非思考模式</option>
                         </select>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                            推荐使用Reasoner模型,可查看AI的思考过程
+                            推荐使用思考模式,可查看AI的思考过程
                         </p>
                     </div>
 

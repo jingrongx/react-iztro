@@ -23,7 +23,7 @@ export interface InterpretationResponse {
 /**
  * 构建AI提示词
  */
-function buildPrompt(astrolabeData: any, focusArea?: string): string {
+export function buildPrompt(astrolabeData: any, focusArea?: string): string {
     const { astrolabe, horoscope } = astrolabeData;
 
     let prompt = `你是一位专业的紫微斗数命理师,请根据以下排盘信息进行详细解读:\n\n`;
@@ -104,7 +104,7 @@ function buildPrompt(astrolabeData: any, focusArea?: string): string {
  */
 export async function interpretAstrolabe(
     request: InterpretationRequest,
-    _onProgress?: (text: string) => void
+    onProgress?: (text: string) => void
 ): Promise<InterpretationResponse> {
     const config = getAIConfig();
 
@@ -114,6 +114,7 @@ export async function interpretAstrolabe(
 
     const { apiKey, model, baseUrl } = config;
     const prompt = buildPrompt(request.astrolabeData, request.focusArea);
+    const useStream = !!onProgress;
 
     try {
         const response = await fetch(`${baseUrl}/v1/chat/completions`, {
@@ -130,7 +131,7 @@ export async function interpretAstrolabe(
                         content: prompt,
                     },
                 ],
-                stream: false, // 暂不支持流式响应
+                stream: useStream,
                 temperature: 0.7,
                 max_tokens: 4000,
             }),
@@ -144,27 +145,73 @@ export async function interpretAstrolabe(
             );
         }
 
-        const data = await response.json();
-
-        if (!data.choices || data.choices.length === 0) {
-            throw new Error('API返回数据格式错误');
+        if (!useStream) {
+            const data = await response.json();
+            if (!data.choices || data.choices.length === 0) {
+                throw new Error('API返回数据格式错误');
+            }
+            const choice = data.choices[0];
+            return {
+                content: choice.message?.content || '',
+                reasoning: choice.message?.reasoning_content,
+                usage: data.usage ? {
+                    promptTokens: data.usage.prompt_tokens,
+                    completionTokens: data.usage.completion_tokens,
+                    totalTokens: data.usage.total_tokens,
+                } : undefined,
+            };
         }
 
-        const choice = data.choices[0];
-        const content = choice.message?.content || '';
+        // 处理流式响应
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error('无法读取响应流');
+        }
 
-        // deepseek-reasoner模型会返回reasoning_content
-        const reasoning = choice.message?.reasoning_content;
+        const decoder = new TextDecoder();
+        let fullContent = '';
+        let fullReasoning = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const dataStr = line.slice(6);
+                    if (dataStr === '[DONE]') continue;
+
+                    try {
+                        const data = JSON.parse(dataStr);
+                        const choice = data.choices?.[0];
+                        if (choice?.delta) {
+                            // deepseek-reasoner 可能会返回 reasoning_content
+                            if (choice.delta.reasoning_content) {
+                                fullReasoning += choice.delta.reasoning_content;
+                                // 如果需要实时显示推理过程，可以修改 onProgress 接口或通过特定格式传递
+                            }
+
+                            if (choice.delta.content) {
+                                const newContent = choice.delta.content;
+                                fullContent += newContent;
+                                onProgress(fullContent);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('解析流式数据失败:', e);
+                    }
+                }
+            }
+        }
 
         return {
-            content,
-            reasoning,
-            usage: data.usage ? {
-                promptTokens: data.usage.prompt_tokens,
-                completionTokens: data.usage.completion_tokens,
-                totalTokens: data.usage.total_tokens,
-            } : undefined,
+            content: fullContent,
+            reasoning: fullReasoning,
         };
+
     } catch (error) {
         if (error instanceof Error) {
             throw error;

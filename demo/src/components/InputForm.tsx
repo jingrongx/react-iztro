@@ -1,5 +1,6 @@
 import { Calendar, ChevronDown, Download, Maximize2, Save, Settings, Sparkles } from 'lucide-react';
 import React, { useState } from 'react';
+import dayjs from 'dayjs';
 
 interface InputFormProps {
     onSubmit: (data: any) => void;
@@ -10,8 +11,8 @@ interface InputFormProps {
 export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings }: InputFormProps) {
     const [formData, setFormData] = useState({
         dateType: 'solar', // solar or lunar
-        date: '1987-11-13',
-        time: 7,
+        date: dayjs().format('YYYY-MM-DD'),
+        time: 0,
         gender: 'male',
         name: '',
         leap: false,

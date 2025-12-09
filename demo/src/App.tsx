@@ -8,12 +8,12 @@ import AIInterpretation from './components/AIInterpretation';
 import dayjs from 'dayjs';
 import './ziwei-theme.css';
 import { isConfigured } from './services/aiConfig';
-import { interpretAstrolabe } from './services/deepseekService';
+import { interpretAstrolabe, buildPrompt } from './services/deepseekService';
 
 function App() {
   const [astrolabeData, setAstrolabeData] = useState({
-    date: '1987-11-13',
-    time: 7,
+    date: dayjs().format('YYYY-MM-DD'),
+    time: 0,
     gender: 'male' as 'male' | 'female',
     dateType: 'solar' as 'solar' | 'lunar',
     leap: false,
@@ -26,6 +26,7 @@ function App() {
     reasoning: '',
     isLoading: false,
     error: '',
+    promptData: '',
   });
 
 
@@ -55,6 +56,7 @@ function App() {
       reasoning: '',
       isLoading: true,
       error: '',
+      promptData: '',
     });
 
     try {
@@ -66,6 +68,12 @@ function App() {
 
       // 生成运势数据
       const horoscopeInstance = astrolabeInstance.horoscope(new Date(), 0);
+      const prompt = buildPrompt({
+        astrolabe: astrolabeInstance,
+        horoscope: horoscopeInstance,
+      });
+
+      setAiResult(prev => ({ ...prev, promptData: prompt }));
 
       // 调用AI服务进行解读
       const result = await interpretAstrolabe({
@@ -73,6 +81,11 @@ function App() {
           astrolabe: astrolabeInstance,
           horoscope: horoscopeInstance,
         },
+      }, (text) => {
+        setAiResult(prev => ({
+          ...prev,
+          content: text,
+        }));
       });
 
       setAiResult({
@@ -80,6 +93,7 @@ function App() {
         reasoning: result.reasoning || '',
         isLoading: false,
         error: '',
+        promptData: aiResult.promptData || prompt,
       });
     } catch (error) {
       setAiResult({
@@ -87,6 +101,7 @@ function App() {
         reasoning: '',
         isLoading: false,
         error: error instanceof Error ? error.message : 'AI解读失败',
+        promptData: aiResult.promptData,
       });
     }
   };
@@ -103,7 +118,7 @@ function App() {
               gender={astrolabeData.gender}
               birthdayType={astrolabeData.dateType}
               isLeapMonth={astrolabeData.leap}
-              horoscopeDate={dayjs(astrolabeData.date).toDate()}
+              horoscopeDate={new Date()}
             />
           </div>
         </div>
@@ -127,6 +142,7 @@ function App() {
           reasoning={aiResult.reasoning}
           isLoading={aiResult.isLoading}
           error={aiResult.error}
+          promptData={aiResult.promptData}
           onClose={() => setShowInterpretation(false)}
         />
       )}
