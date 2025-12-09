@@ -20,20 +20,21 @@ export default function InputForm({ onSubmit }: InputFormProps) {
         onSubmit(formData);
     };
 
-    // 时辰选项 - 每个时辰使用其中间小时值
+    // 时辰选项 - 使用时辰索引（0-11）
+    // iztro 库需要的是时辰索引，而非小时值
     const timeOptions = [
-        { value: 0, label: '子 23:00-01:00' },
-        { value: 2, label: '丑 01:00-03:00' },
-        { value: 4, label: '寅 03:00-05:00' },
-        { value: 6, label: '卯 05:00-07:00' },
-        { value: 8, label: '辰 07:00-09:00' },
-        { value: 10, label: '巳 09:00-11:00' },
-        { value: 12, label: '午 11:00-13:00' },
-        { value: 14, label: '未 13:00-15:00' },
-        { value: 16, label: '申 15:00-17:00' },
-        { value: 18, label: '酉 17:00-19:00' },
-        { value: 20, label: '戌 19:00-21:00' },
-        { value: 22, label: '亥 21:00-23:00' },
+        { value: 0, label: '子 23:00-01:00' },  // 早子时，索引0
+        { value: 1, label: '丑 01:00-03:00' },  // 丑时，索引1
+        { value: 2, label: '寅 03:00-05:00' },  // 寅时，索引2
+        { value: 3, label: '卯 05:00-07:00' },  // 卯时，索引3
+        { value: 4, label: '辰 07:00-09:00' },  // 辰时，索引4
+        { value: 5, label: '巳 09:00-11:00' },  // 巳时，索引5
+        { value: 6, label: '午 11:00-13:00' },  // 午时，索引6
+        { value: 7, label: '未 13:00-15:00' },  // 未时，索引7
+        { value: 8, label: '申 15:00-17:00' },  // 申时，索引8
+        { value: 9, label: '酉 17:00-19:00' },  // 酉时，索引9
+        { value: 10, label: '戌 19:00-21:00' }, // 戌时，索引10
+        { value: 11, label: '亥 21:00-23:00' }, // 亥时，索引11
     ];
 
     return (
