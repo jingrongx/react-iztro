@@ -54,7 +54,7 @@ function App() {
           scale: 2, // High resolution
           backgroundColor: '#ffffff', // Ensure white background
           logging: true, // Enable logging to debug
-          onclone: (document) => {
+          onclone: (_doc) => {
             // 可以在这里处理克隆后的文档，比如修改样式
             console.log('DOM cloned for capture');
           }
