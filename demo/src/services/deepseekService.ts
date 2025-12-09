@@ -104,7 +104,7 @@ function buildPrompt(astrolabeData: any, focusArea?: string): string {
  */
 export async function interpretAstrolabe(
     request: InterpretationRequest,
-    onProgress?: (text: string) => void
+    _onProgress?: (text: string) => void
 ): Promise<InterpretationResponse> {
     const config = getAIConfig();
 
