@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import html2canvas from 'html2canvas';
 import { Iztrolabe } from 'react-iztro';
 import { astro } from 'iztro';
 import Header from './components/Header';
@@ -28,6 +29,55 @@ function App() {
     error: '',
     promptData: '',
   });
+
+  const astrolabeRef = useRef<HTMLDivElement>(null);
+
+  const handleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      astrolabeRef.current?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const handleDownload = async () => {
+    if (astrolabeRef.current) {
+      try {
+        const canvas = await html2canvas(astrolabeRef.current, {
+          useCORS: true,
+          scale: 2, // High resolution
+          backgroundColor: '#ffffff' // Ensure white background
+        });
+        const link = document.createElement('a');
+        link.download = `ziwei-chart-${dayjs().format('YYYYMMDD-HHmmss')}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (e) {
+        console.error('Download failed', e);
+        alert('下载失败，请重试');
+      }
+    }
+  };
+
+  const handleSave = () => {
+    try {
+      const savedCharts = JSON.parse(localStorage.getItem('ziwei_saved_charts') || '[]');
+      const newChart = {
+        id: Date.now(),
+        data: astrolabeData,
+        savedAt: new Date().toISOString(),
+        name: `命盘 ${dayjs().format('YYYY-MM-DD HH:mm')}`
+      };
+      savedCharts.push(newChart);
+      localStorage.setItem('ziwei_saved_charts', JSON.stringify(savedCharts));
+      alert('命盘保存成功！');
+    } catch (e) {
+      console.error('Save failed', e);
+      alert('保存失败，请检查浏览器设置');
+    }
+  };
 
 
 
@@ -111,7 +161,7 @@ function App() {
       <Header />
       <main className="flex-1 flex overflow-hidden">
         <div className="flex-1 p-4 md:p-8 pb-20 overflow-auto flex justify-center items-start md:items-center">
-          <div className="w-full max-w-5xl aspect-square shadow-2xl rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1">
+          <div ref={astrolabeRef} className="w-full max-w-5xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1">
             <Iztrolabe
               birthday={astrolabeData.date}
               birthTime={astrolabeData.time}
@@ -126,6 +176,9 @@ function App() {
           onSubmit={handleFormSubmit}
           onAIInterpret={handleAIInterpret}
           onOpenSettings={() => setShowSettings(true)}
+          onFullscreen={handleFullscreen}
+          onDownload={handleDownload}
+          onSave={handleSave}
         />
       </main>
 

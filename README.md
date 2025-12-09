@@ -1,10 +1,10 @@
 <div align="center">
 
-# 📦 react-iztro
+# 📦 react-iztro - 紫微斗数 AI解读版
 
-基于 [iztro](https://github.com/SylarLong/iztro) 实现的react组件，用于生成一张紫微斗数星盘。
+基于 [iztro](https://github.com/SylarLong/iztro) 实现的react组件，用于生成一张紫微斗数星盘，并集成了强大的 AI 解读功能。
 
-react component of [iztro](https://github.com/SylarLong/iztro) used to generate an astrolabe of Zi Wei Dou Shu.
+react component of [iztro](https://github.com/SylarLong/iztro) used to generate an astrolabe of Zi Wei Dou Shu, now with powerful AI interpretation capabilities.
 
 </div>
 
@@ -20,10 +20,30 @@ react component of [iztro](https://github.com/SylarLong/iztro) used to generate 
 
 ---
 
-## 功能
+## AI 核心功能 (New 🚀)
+
+本版本集成了 DeepSeek AI 模型（支持 deepseek-reasoner 推理模型），提供专业的紫微斗数命盘解读服务。
+
+- **智能命盘分析**
+  
+  AI 能够识别完整的命盘数据，包括主星、辅星、四化、流耀等，结合宫位关系进行深度分析。
+
+- **多维度解读**
+  
+  支持从本命性格、事业财运、婚姻情感等多个维度进行详细解读，并提供流年运势分析。
+
+- **流式响应体验**
+  
+  采用流式（Streaming）响应技术，实时展示 AI 的思考过程和解读结果，体验流畅自然。
+
+- **BYOK (Bring Your Own Key)**
+  
+  支持用户配置自己的 DeepSeek API Key，无需依赖第三方服务，确保数据安全与隐私。
+
+## 基础功能
 
 - 展示完整紫微斗数星盘
-  
+
   包含所有 `主星`，`辅星`，`杂耀`，`四化`，`神煞`，`流耀` 以及星耀的 `亮度`。高亮显示重要的星耀，比如 `桃花星`，`解神`，`禄存` 和 `天马`。
 
 - 合理的星耀分布
@@ -55,6 +75,12 @@ react component of [iztro](https://github.com/SylarLong/iztro) used to generate 
   零配置快速集成到你的页面中，对于集成几乎没有学习成本。你可以根据自己的页面风格自行调整样式，或控制各个元素的显示与隐藏（通过覆盖默认样式）。
 
 集成到页面中的界面如下图所示。你也可以直接访问官方的 [紫微斗数 AI解读版 - 紫微斗数在线排盘](https://react-iztro-nine.vercel.app/) 查看效果。
+
+<div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+  <img src="./assets/preview-1.png" alt="preview-1" width="30%" />
+  <img src="./assets/preview-2.png" alt="preview-2" width="30%" />
+  <img src="./assets/preview-3.png" alt="preview-3" width="30%" />
+</div>
 
 <img width="928" alt="react-iztro" src="https://github.com/SylarLong/react-iztro/assets/6510425/2817bb0c-89b5-4f33-ac5c-75481ad33209">
 

@@ -6,9 +6,12 @@ interface InputFormProps {
     onSubmit: (data: any) => void;
     onAIInterpret?: () => void;
     onOpenSettings?: () => void;
+    onFullscreen?: () => void;
+    onDownload?: () => void;
+    onSave?: () => void;
 }
 
-export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings }: InputFormProps) {
+export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings, onFullscreen, onDownload, onSave }: InputFormProps) {
     const [formData, setFormData] = useState({
         dateType: 'solar', // solar or lunar
         date: dayjs().format('YYYY-MM-DD'),
@@ -168,19 +171,28 @@ export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings }: I
                     </div>
                     <span>设置</span>
                 </button>
-                <button className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors">
+                <button
+                    onClick={onFullscreen}
+                    className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors"
+                >
                     <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/30">
                         <Maximize2 size={18} />
                     </div>
                     <span>全屏</span>
                 </button>
-                <button className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors">
+                <button
+                    onClick={onDownload}
+                    className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors"
+                >
                     <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/30">
                         <Download size={18} />
                     </div>
                     <span>下载</span>
                 </button>
-                <button className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors">
+                <button
+                    onClick={onSave}
+                    className="flex flex-col items-center gap-1 text-xs text-gray-500 hover:text-purple-600 transition-colors"
+                >
                     <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-purple-900/30">
                         <Save size={18} />
                     </div>
