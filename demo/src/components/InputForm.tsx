@@ -20,20 +20,20 @@ export default function InputForm({ onSubmit }: InputFormProps) {
         onSubmit(formData);
     };
 
-    // 时辰选项
+    // 时辰选项 - 每个时辰使用其中间小时值
     const timeOptions = [
         { value: 0, label: '子 23:00-01:00' },
-        { value: 1, label: '丑 01:00-03:00' },
-        { value: 3, label: '寅 03:00-05:00' },
-        { value: 5, label: '卯 05:00-07:00' },
-        { value: 7, label: '辰 07:00-09:00' },
-        { value: 9, label: '巳 09:00-11:00' },
-        { value: 11, label: '午 11:00-13:00' },
-        { value: 13, label: '未 13:00-15:00' },
-        { value: 15, label: '申 15:00-17:00' },
-        { value: 17, label: '酉 17:00-19:00' },
-        { value: 19, label: '戌 19:00-21:00' },
-        { value: 21, label: '亥 21:00-23:00' },
+        { value: 2, label: '丑 01:00-03:00' },
+        { value: 4, label: '寅 03:00-05:00' },
+        { value: 6, label: '卯 05:00-07:00' },
+        { value: 8, label: '辰 07:00-09:00' },
+        { value: 10, label: '巳 09:00-11:00' },
+        { value: 12, label: '午 11:00-13:00' },
+        { value: 14, label: '未 13:00-15:00' },
+        { value: 16, label: '申 15:00-17:00' },
+        { value: 18, label: '酉 17:00-19:00' },
+        { value: 20, label: '戌 19:00-21:00' },
+        { value: 22, label: '亥 21:00-23:00' },
     ];
 
     return (
