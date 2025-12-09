@@ -1,4 +1,4 @@
-import { Calendar, ChevronDown, Download, Maximize2, Save, Settings, Sparkles } from 'lucide-react';
+import { Calendar, ChevronDown, Download, Maximize2, Save, Settings, Sparkles, Github } from 'lucide-react';
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
 
@@ -208,6 +208,19 @@ export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings, onF
                 <Sparkles size={18} />
                 <span>AI 解读命盘</span>
             </button>
-        </div>
+
+
+            <div className="mt-auto pt-6 border-t border-gray-100 dark:border-gray-800">
+                <a
+                    href="https://github.com/jingrongx/react-iztro"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                >
+                    <Github size={14} />
+                    <span>Open Source on GitHub</span>
+                </a>
+            </div>
+        </div >
     );
 }
