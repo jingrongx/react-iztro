@@ -70,7 +70,7 @@ function buildPrompt(astrolabeData: any, focusArea?: string): string {
     if (horoscope?.decadal) {
         prompt += `\n## 当前大限\n`;
         prompt += `- 大限宫位: ${horoscope.decadal.name}\n`;
-        prompt += `- 大限年龄: ${horoscope.decadal.range.join('-')}岁\n`;
+        prompt += `- 大限年龄: ${horoscope.decadal.range?.join('-') || ''}岁\n`;
     }
 
     // 流年信息
