@@ -75,6 +75,32 @@ export default function AIInterpretation({
 
                 {/* 内容区域 */}
                 <div className="flex-1 overflow-y-auto p-6">
+                    {/* Prompt Data Section - Always show if available */}
+                    {promptData && (
+                        <div className="mb-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                            <button
+                                onClick={() => setShowPrompt(!showPrompt)}
+                                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                            >
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    📝 发送给AI的数据
+                                </span>
+                                {showPrompt ? (
+                                    <ChevronUp size={16} className="text-gray-500" />
+                                ) : (
+                                    <ChevronDown size={16} className="text-gray-500" />
+                                )}
+                            </button>
+                            {showPrompt && (
+                                <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-pre-wrap font-mono max-h-60 overflow-y-auto">
+                                        {promptData}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {isLoading && (
                         <div className="flex flex-col items-center justify-center py-12">
                             <div className="relative">
@@ -114,31 +140,6 @@ export default function AIInterpretation({
                                         <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
                                             <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap font-mono">
                                                 {reasoning}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                            {/* Prompt Data Section */}
-                            {promptData && (
-                                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                                    <button
-                                        onClick={() => setShowPrompt(!showPrompt)}
-                                        className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                                    >
-                                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            📝 发送给AI的数据
-                                        </span>
-                                        {showPrompt ? (
-                                            <ChevronUp size={16} className="text-gray-500" />
-                                        ) : (
-                                            <ChevronDown size={16} className="text-gray-500" />
-                                        )}
-                                    </button>
-                                    {showPrompt && (
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
-                                            <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-pre-wrap font-mono max-h-60 overflow-y-auto">
-                                                {promptData}
                                             </div>
                                         </div>
                                     )}
