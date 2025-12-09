@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { Iztrolabe } from 'react-iztro';
 import { astro } from 'iztro';
 import Header from './components/Header';
@@ -48,21 +48,15 @@ function App() {
         // 等待一小段时间确保DOM渲染完成
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        const canvas = await html2canvas(astrolabeRef.current, {
-          useCORS: true,
-          allowTaint: true,
-          scale: 2, // High resolution
-          backgroundColor: '#ffffff', // Ensure white background
-          logging: true, // Enable logging to debug
-          onclone: (_doc) => {
-            // 可以在这里处理克隆后的文档，比如修改样式
-            console.log('DOM cloned for capture');
-          }
+        const dataUrl = await toPng(astrolabeRef.current, {
+          cacheBust: true,
+          backgroundColor: '#ffffff',
+          pixelRatio: 2, // High resolution
         });
 
         const link = document.createElement('a');
         link.download = `ziwei-chart-${dayjs().format('YYYYMMDD-HHmmss')}.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.href = dataUrl;
         link.click();
       } catch (e) {
         console.error('Download failed detail:', e);
