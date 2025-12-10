@@ -163,8 +163,8 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-200">
       <Header />
-      <main className="flex-1 flex overflow-hidden">
-        <div className="flex-1 p-4 md:p-8 pb-20 overflow-auto flex justify-center items-start md:items-center">
+      <main className="flex-1 flex flex-col md:flex-row md:overflow-hidden relative">
+        <div className="flex-1 p-4 md:p-8 pb-20 md:pb-8 md:overflow-auto flex justify-center items-start md:items-center">
           <div ref={astrolabeRef} className="w-full max-w-5xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-1">
             <Iztrolabe
               birthday={astrolabeData.date}

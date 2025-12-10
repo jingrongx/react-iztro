@@ -44,7 +44,7 @@ export default function InputForm({ onSubmit, onAIInterpret, onOpenSettings, onF
     ];
 
     return (
-        <div className="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-6 flex flex-col h-[calc(100vh-64px)] overflow-y-auto">
+        <div className="w-full md:w-80 bg-white dark:bg-gray-800 border-t md:border-t-0 md:border-l border-gray-200 dark:border-gray-700 p-6 flex flex-col h-auto md:h-[calc(100vh-64px)] md:overflow-y-auto">
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                     <label className="text-sm text-gray-500 dark:text-gray-400">日期类型</label>
