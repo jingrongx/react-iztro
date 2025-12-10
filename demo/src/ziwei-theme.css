@@ -134,3 +134,71 @@
     padding-bottom: 3px;
     overflow: hidden;
 }
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+    .iztro-astrolabe-theme-default {
+        --iztro-star-font-size-big: 10px;
+        --iztro-star-font-size-small: 8px;
+    }
+
+    .iztro-palace {
+        padding: 0 !important;
+    }
+
+    .iztro-palace-name {
+        font-size: 8px !important;
+        padding: 0 1px !important;
+        margin: 0 !important;
+        line-height: 1.1 !important;
+    }
+
+    .iztro-palace-legend-label {
+        display: none;
+    }
+
+    /* Reduce spacing for stars */
+    .iztro-star-mutagen {
+        margin-left: 0 !important;
+        padding: 0 1px !important;
+    }
+
+    /* Center Palace Optimizations */
+    .iztro-center-palace .center-title {
+        font-size: 10px !important;
+        padding: 2px 0 !important;
+    }
+
+    .iztro-center-palace ul.basic-info {
+        margin: 2px !important;
+        column-gap: 2px !important;
+    }
+
+    .basic-info .iztro-item {
+        padding: 0 !important;
+        border-bottom: none !important;
+    }
+
+    .horo-buttons {
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 2px;
+        margin: 4px 2px !important;
+    }
+
+    .horo-buttons .center-button {
+        padding: 2px 0 !important;
+        font-size: 9px !important;
+    }
+
+    .horo-buttons .center-horo-hour {
+        font-size: 9px !important;
+        justify-content: center;
+    }
+
+    .iztro-copyright {
+        font-size: 8px !important;
+        bottom: 1px !important;
+        right: 1px !important;
+    }
+}
