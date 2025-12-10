@@ -21,6 +21,7 @@ export default function AIInterpretation({
     onClose,
 }: AIInterpretationProps) {
     const [copied, setCopied] = useState(false);
+    const [promptCopied, setPromptCopied] = useState(false);
     const [showReasoning, setShowReasoning] = useState(false);
     const [showPrompt, setShowPrompt] = useState(false);
 
@@ -31,6 +32,17 @@ export default function AIInterpretation({
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('复制失败:', err);
+        }
+    };
+
+    const handleCopyPrompt = async () => {
+        if (!promptData) return;
+        try {
+            await navigator.clipboard.writeText(promptData);
+            setPromptCopied(true);
+            setTimeout(() => setPromptCopied(false), 2000);
+        } catch (err) {
+            console.error('复制Prompt失败:', err);
         }
     };
 
@@ -78,19 +90,40 @@ export default function AIInterpretation({
                     {/* Prompt Data Section - Always show if available */}
                     {promptData && (
                         <div className="mb-4 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                            <button
-                                onClick={() => setShowPrompt(!showPrompt)}
-                                className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    📝 发送给AI的数据
-                                </span>
-                                {showPrompt ? (
-                                    <ChevronUp size={16} className="text-gray-500" />
-                                ) : (
-                                    <ChevronDown size={16} className="text-gray-500" />
-                                )}
-                            </button>
+                            <div className="w-full flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50">
+                                <button
+                                    onClick={() => setShowPrompt(!showPrompt)}
+                                    className="flex items-center gap-2 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+                                >
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        📝 发送给AI的数据
+                                    </span>
+                                    {showPrompt ? (
+                                        <ChevronUp size={16} className="text-gray-500" />
+                                    ) : (
+                                        <ChevronDown size={16} className="text-gray-500" />
+                                    )}
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleCopyPrompt();
+                                    }}
+                                    className="text-xs flex items-center gap-1 text-purple-600 dark:text-purple-400 hover:underline"
+                                >
+                                    {promptCopied ? (
+                                        <>
+                                            <Check size={14} />
+                                            <span>已复制</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Copy size={14} />
+                                            <span>复制内容</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                             {showPrompt && (
                                 <div className="p-4 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-200 dark:border-gray-700">
                                     <div className="text-xs text-gray-500 dark:text-gray-400 whitespace-pre-wrap font-mono max-h-60 overflow-y-auto">

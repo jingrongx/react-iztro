@@ -96,23 +96,6 @@ function App() {
   };
 
   const handleAIInterpret = async () => {
-    // 检查是否已配置API密钥
-    if (!isConfigured()) {
-      alert('请先在设置中配置DeepSeek API密钥');
-      setShowSettings(true);
-      return;
-    }
-
-    // 显示解读对话框并开始加载
-    setShowInterpretation(true);
-    setAiResult({
-      content: '',
-      reasoning: '',
-      isLoading: true,
-      error: '',
-      promptData: '',
-    });
-
     try {
       // 使用iztro直接生成astrolabe数据
       const inputDate = dayjs(astrolabeData.date).format('YYYY-MM-DD');
@@ -127,7 +110,28 @@ function App() {
         horoscope: horoscopeInstance,
       });
 
-      setAiResult(prev => ({ ...prev, promptData: prompt }));
+      // 检查是否已配置API密钥
+      if (!isConfigured()) {
+        setShowInterpretation(true);
+        setAiResult({
+          content: '',
+          reasoning: '',
+          isLoading: false,
+          error: '未配置API密钥。您可以复制上方【发送给AI的数据】手动询问。',
+          promptData: prompt,
+        });
+        return;
+      }
+
+      // 显示解读对话框并开始加载
+      setShowInterpretation(true);
+      setAiResult({
+        content: '',
+        reasoning: '',
+        isLoading: true,
+        error: '',
+        promptData: prompt,
+      });
 
       // 调用AI服务进行解读
       const result = await interpretAstrolabe({
@@ -147,7 +151,7 @@ function App() {
         reasoning: result.reasoning || '',
         isLoading: false,
         error: '',
-        promptData: aiResult.promptData || prompt,
+        promptData: prompt,
       });
     } catch (error) {
       setAiResult({
