@@ -215,9 +215,9 @@ function App() {
           <p className="text-gray-600 dark:text-gray-400 mb-4">望诊+问诊辨证更准确，中医思维真中医</p>
           <p className="text-amber-600 dark:text-amber-400 mb-6">💡 建议使用电脑访问网页版，或下载安卓APP获得最佳体验</p>
           <div className="flex flex-wrap justify-center gap-4 mb-6">
-            <a href="#" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">访问官网</a>
-            <a href="#" className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">国内下载 APK</a>
-            <a href="#" className="bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-6 rounded-lg transition-colors">GitHub下载</a>
+            <a href="https://www.jingfangjia.chat/" target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">访问官网</a>
+            <a href="https://ghproxy.net/https://github.com/jingrongx/jingfangjia-ai-releases/releases/download/v1.7.51/JingFangJia-AI-v1.7.51.apk" target="_blank" rel="noopener noreferrer" className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">国内下载 APK</a>
+            <a href="https://github.com/jingrongx/jingfangjia-ai-releases/releases/download/v1.7.51/JingFangJia-AI-v1.7.51.apk" target="_blank" rel="noopener noreferrer" className="bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-6 rounded-lg transition-colors">GitHub下载</a>
           </div>
           <p className="text-gray-600 dark:text-gray-400 mb-4">微信搜索关注【经方家AI】，免费获取海量中医经典资料</p>
           <p className="text-gray-500 dark:text-gray-500 text-sm">本程序仅供学习研究使用，请勿用于商业用途</p>
