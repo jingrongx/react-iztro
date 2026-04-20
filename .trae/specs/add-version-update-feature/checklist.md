@@ -1,0 +1,26 @@
+- [x] vite.config.ts 中已注入 `__APP_VERSION__` 全局常量，值为 package.json 版本号
+- [x] vite-env.d.ts 已声明 `__APP_VERSION__` 类型为 string
+- [x] downloadUtils.ts 可正确生成 APK/EXE 的 GitHub 直链和 ghproxy 镜像链接
+- [x] openUrl.ts 兼容 Tauri 和浏览器环境打开外部链接
+- [x] useTauriUpdater Hook 可在 Tauri 环境中检测更新、下载安装、跟踪进度
+- [x] useTauriUpdater Hook 在非 Tauri 环境中不执行任何操作
+- [x] UpdateChecker 组件通过 GitHub API 检查更新，发现新版本时显示更新横幅
+- [x] UpdateChecker 组件提供"国内下载"（ghproxy）和"GitHub"两个下载按钮
+- [x] UpdateChecker 组件支持关闭横幅，同一版本不再重复提示
+- [x] UpdateChecker 组件使用 localStorage 缓存检查结果，4小时内不重复请求
+- [x] UpdateChecker 底部显示当前版本号和最新版本号信息
+- [x] TauriUpdateBanner 组件仅在 Tauri 环境下渲染
+- [x] TauriUpdateBanner 显示更新横幅、下载进度条和"立即更新"按钮
+- [x] App.tsx 已集成 TauriUpdateBanner 和 UpdateChecker 组件
+- [x] capacitor.config.ts 已增加 SplashScreen 和 androidScheme 配置
+- [x] Android build.gradle 已配置签名、版本号同步、APK 文件名自定义
+- [x] src-tauri/ 目录结构完整，包含 tauri.conf.json、Cargo.toml、main.rs、lib.rs、build.rs
+- [x] tauri.conf.json 配置了窗口（visible: false）、NSIS 打包、Updater 端点（ghproxy + GitHub）
+- [x] lib.rs 注册了 tauri_plugin_updater 和 tauri_plugin_opener，setup 中调用 window.show()
+- [x] nsis-simpchinese.nsh NSIS 安装器中文化文件已创建
+- [x] package.json 已添加 Tauri 相关依赖和脚本
+- [x] release.yml CI/CD 工作流包含 Android APK 和 Windows Tauri 两个构建 Job
+- [x] release.yml 自动递增版本号并同步到 Android build.gradle
+- [x] release.yml Release Notes 包含下载链接（含 ghproxy 镜像）
+- [x] TypeScript 编译无错误
+- [x] Demo 应用可正常构建（npm run build）

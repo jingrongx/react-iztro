@@ -11,7 +11,7 @@ lerna-debug.log*
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .vscode
-lib
+/lib
 
 # Runtime data
 pids
@@ -131,3 +131,10 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Signing keys
+.key/
+*.keystore
+*.keystore.base64
+*.key
+*.key.pub

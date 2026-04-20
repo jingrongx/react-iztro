@@ -1,0 +1,217 @@
+name: Release
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (optional)'
+        required: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: demo/package-lock.json
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Install dependencies
+        run: cd demo && npm install
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update version
+        run: |
+          cd demo
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo "Current version: $CURRENT_VERSION"
+
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          NEW_VERSION="$major.$minor.$((patch + 1))"
+          echo "New version: $NEW_VERSION"
+
+          npm version --no-git-tag-version $NEW_VERSION
+
+          cd android
+          NEW_VERSION_CODE=$(grep "versionCode" app/build.gradle | grep -o '[0-9]\+')
+          NEW_VERSION_CODE=$((NEW_VERSION_CODE + 1))
+          sed -i "s/versionCode [0-9]\+/versionCode $NEW_VERSION_CODE/" app/build.gradle
+          sed -i "s/versionName \".*\"/versionName \"$NEW_VERSION\"/" app/build.gradle
+
+          cd ../..
+          git add demo/package.json demo/android/app/build.gradle
+          git commit -m "chore: auto bump version to $NEW_VERSION"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Build web
+        run: cd demo && npm run build
+
+      - name: Sync to Android
+        run: cd demo && npx cap sync android
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > demo/android/app/release.keystore
+
+      - name: Build APK
+        run: |
+          cd demo/android
+          ./gradlew assembleRelease
+
+      - name: List APK files
+        run: find demo/android/app/build/outputs/apk/release -name "*.apk" -type f
+
+      - name: Get version
+        id: get-version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            VERSION=$(node -p "require('./demo/package.json').version")
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate release notes
+        id: generate-notes
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -n "$LAST_TAG" ]; then
+            RELEASE_NOTES=$(git log $LAST_TAG..HEAD --pretty=format:"- %s" --grep="^(feat\|fix\|refactor\|docs\|perf)")
+          else
+            RELEASE_NOTES=$(git log --pretty=format:"- %s" --grep="^(feat\|fix\|refactor\|docs\|perf)")
+          fi
+
+          if [ -z "$RELEASE_NOTES" ]; then
+            RELEASE_NOTES="- auto version bump"
+          fi
+
+          echo "release_notes<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release (APK only)
+        uses: softprops/action-gh-release@v1
+        with:
+          files: demo/android/app/build/outputs/apk/release/react-iztro_*.apk
+          tag_name: v${{ steps.get-version.outputs.version }}
+          name: v${{ steps.get-version.outputs.version }}
+          body: |
+            ## What's Changed
+            ${{ steps.generate-notes.outputs.release_notes }}
+
+            ---
+
+            ## Downloads
+
+            ### Android
+            - [GitHub APK](https://github.com/jingrongx/react-iztro/releases/download/v${{ steps.get-version.outputs.version }}/react-iztro_v${{ steps.get-version.outputs.version }}.apk)
+            - [Mirror APK](https://ghproxy.net/https://github.com/jingrongx/react-iztro/releases/download/v${{ steps.get-version.outputs.version }}/react-iztro_v${{ steps.get-version.outputs.version }}.apk)
+
+            ### Windows Desktop (building...)
+
+            > Please wait for the desktop build to complete, then refresh this page.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-desktop:
+    runs-on: windows-latest
+    needs: release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: demo/package-lock.json
+
+      - name: Install dependencies
+        run: cd demo && npm install
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './demo/src-tauri -> target'
+
+      - name: Build frontend
+        run: cd demo && npm run build
+
+      - name: Build Tauri app (Windows)
+        run: cd demo && npm run tauri:build
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+      - name: List EXE files
+        shell: pwsh
+        run: Get-ChildItem -Path "demo\src-tauri\target\release\bundle\nsis" -Filter "*.exe" -Recurse | Select-Object FullName
+
+      - name: Get version
+        id: get-version
+        shell: pwsh
+        run: |
+          $VERSION = node -p "require('./demo/package.json').version"
+          Add-Content -Path $env:GITHUB_OUTPUT -Value "version=$VERSION"
+
+      - name: Upload EXE to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: demo/src-tauri/target/release/bundle/nsis/react-iztro_*_x64-setup.exe
+          tag_name: v${{ steps.get-version.outputs.version }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update release notes
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ steps.get-version.outputs.version }}
+          body: |
+            ## What's Changed
+
+            ---
+
+            ## Downloads
+
+            ### Android
+            - [GitHub APK](https://github.com/jingrongx/react-iztro/releases/download/v${{ steps.get-version.outputs.version }}/react-iztro_v${{ steps.get-version.outputs.version }}.apk)
+            - [Mirror APK](https://ghproxy.net/https://github.com/jingrongx/react-iztro/releases/download/v${{ steps.get-version.outputs.version }}/react-iztro_v${{ steps.get-version.outputs.version }}.apk)
+
+            ### Windows Desktop
+            - [GitHub EXE](https://github.com/jingrongx/react-iztro/releases/download/v${{ steps.get-version.outputs.version }}/react-iztro_${{ steps.get-version.outputs.version }}_x64-setup.exe)
+            - [Mirror EXE](https://ghproxy.net/https://github.com/jingrongx/react-iztro/releases/download/v${{ steps.get-version.outputs.version }}/react-iztro_${{ steps.get-version.outputs.version }}_x64-setup.exe)
+
+            > Desktop app: ~15MB, auto-update, no dependencies needed.
+            > Just download, install, and run!
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

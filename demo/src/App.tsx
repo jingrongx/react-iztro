@@ -6,6 +6,8 @@ import Header from './components/Header';
 import InputForm from './components/InputForm';
 import AISettings from './components/AISettings';
 import AIInterpretation from './components/AIInterpretation';
+import TauriUpdateBanner from './components/TauriUpdateBanner';
+import UpdateChecker from './components/UpdateChecker';
 import dayjs from 'dayjs';
 import './ziwei-theme.css';
 import { isConfigured } from './services/aiConfig';
@@ -166,6 +168,8 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex flex-col font-sans transition-colors duration-200">
+      <TauriUpdateBanner />
+      <UpdateChecker />
       <Header />
       <main className="flex-1 flex flex-col md:flex-row md:overflow-hidden relative">
         <div className="flex-1 p-4 md:p-8 pb-20 md:pb-8 md:overflow-auto flex justify-center items-start md:items-center">
