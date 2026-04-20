@@ -1,14 +1,20 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesFile = rootProject.file("app/key.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.iztro.ai"
     compileSdk = rootProject.ext.compileSdkVersion
     signingConfigs {
         release {
-            storeFile file('release.keystore')
-            storePassword 'iztro123'
-            keyAlias 'iztro'
-            keyPassword 'iztro123'
+            storeFile file(keystoreProperties['storeFile'] ?: 'release.keystore')
+            storePassword keystoreProperties['storePassword'] ?: ''
+            keyAlias keystoreProperties['keyAlias'] ?: ''
+            keyPassword keystoreProperties['keyPassword'] ?: ''
         }
     }
     defaultConfig {
