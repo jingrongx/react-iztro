@@ -80,7 +80,7 @@ jobs:
           storeFile=release.keystore
           storePassword=${{ secrets.KEYSTORE_PASSWORD }}
           keyAlias=iztro
-          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
           EOF
 
       - name: Build APK
