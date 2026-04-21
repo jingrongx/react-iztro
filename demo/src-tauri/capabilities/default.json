@@ -7,6 +7,8 @@
     "core:default",
     "opener:default",
     "shell:allow-open",
+    "dialog:allow-save",
+    "fs:allow-write-file",
     "updater:default"
   ]
 }

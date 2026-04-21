@@ -13,6 +13,7 @@ import './ziwei-theme.css';
 import { isConfigured } from './services/aiConfig';
 import { interpretAstrolabe, buildPrompt } from './services/deepseekService';
 import { openUrl } from './lib/openUrl';
+import { isTauri } from './hooks/useTauriUpdater';
 
 function App() {
   const [astrolabeData, setAstrolabeData] = useState({
@@ -67,19 +68,51 @@ function App() {
   const handleDownload = async () => {
     if (astrolabeRef.current) {
       try {
-        // 等待一小段时间确保DOM渲染完成
         await new Promise(resolve => setTimeout(resolve, 100));
 
         const dataUrl = await toPng(astrolabeRef.current, {
           cacheBust: true,
           backgroundColor: '#ffffff',
-          pixelRatio: 2, // High resolution
+          pixelRatio: 2,
         });
 
-        const link = document.createElement('a');
-        link.download = `ziwei-chart-${dayjs().format('YYYYMMDD-HHmmss')}.png`;
-        link.href = dataUrl;
-        link.click();
+        if (isTauri()) {
+          const base64Data = dataUrl.split(',')[1];
+          const fileName = `ziwei-chart-${dayjs().format('YYYYMMDD-HHmmss')}.png`;
+
+          try {
+            const { save } = await import('@tauri-apps/plugin-dialog');
+            const filePath = await save({
+              defaultPath: fileName,
+              filters: [{ name: 'PNG', extensions: ['png'] }],
+            });
+            if (filePath) {
+              const { writeFile } = await import('@tauri-apps/plugin-fs');
+              const binaryString = atob(base64Data);
+              const bytes = new Uint8Array(binaryString.length);
+              for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+              }
+              await writeFile(filePath, bytes);
+              alert('图片保存成功！');
+            }
+          } catch (dialogErr) {
+            console.warn('Tauri dialog/fs 失败，尝试备用方案:', dialogErr);
+            const link = document.createElement('a');
+            link.download = fileName;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        } else {
+          const link = document.createElement('a');
+          link.download = `ziwei-chart-${dayjs().format('YYYYMMDD-HHmmss')}.png`;
+          link.href = dataUrl;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       } catch (e) {
         console.error('Download failed detail:', e);
         alert('下载失败，请重试。如果问题持续，请尝试使用系统自带截图工具。');
@@ -192,8 +225,8 @@ function App() {
       <UpdateChecker />
       <Header />
       <main className="flex-1 flex flex-col md:flex-row md:overflow-hidden relative">
-        <div className="flex-1 p-4 md:p-8 pb-20 md:pb-8 md:overflow-auto flex justify-center items-start md:items-center">
-          <div ref={astrolabeRef} className="astrolabe-container w-full max-w-5xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-0 md:p-1 relative">
+        <div className="flex-1 p-4 md:p-8 pb-20 md:pb-8 md:overflow-auto flex justify-center items-start">
+          <div ref={astrolabeRef} onClick={isFullscreen ? exitFullscreen : undefined} className={`astrolabe-container w-full max-w-5xl shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-0 md:p-1 relative${isFullscreen ? ' cursor-pointer' : ''}`}>
             <Iztrolabe
               birthday={astrolabeData.date}
               birthTime={astrolabeData.time}
@@ -202,17 +235,6 @@ function App() {
               isLeapMonth={astrolabeData.leap}
               horoscopeDate={new Date()}
             />
-            {isFullscreen && (
-              <button
-                onClick={exitFullscreen}
-                className="fixed top-4 right-4 z-50 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-colors"
-                title="退出全屏"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
-                </svg>
-              </button>
-            )}
           </div>
         </div>
         <InputForm
