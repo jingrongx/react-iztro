@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Download, ExternalLink, RefreshCw } from 'lucide-react';
 import { openUrl } from '../lib/openUrl';
+import { isWindows } from '../lib/platformUtils';
 
 const CURRENT_VERSION = __APP_VERSION__;
 
@@ -10,11 +11,6 @@ interface ReleaseInfo {
   tag_name: string;
   html_url: string;
   assets: { name: string; browser_download_url: string }[];
-}
-
-function isWindows(): boolean {
-  if (typeof navigator === 'undefined') return false;
-  return navigator.platform.indexOf('Win') > -1;
 }
 
 const UpdateChecker: React.FC = () => {

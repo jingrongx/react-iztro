@@ -1,8 +1,21 @@
 import { Moon, Sun, Globe, Download, Github } from 'lucide-react';
 import { useState } from 'react';
+import { openUrl } from '../lib/openUrl';
+import { isWindows } from '../lib/platformUtils';
+import { getGhproxyApkDownloadUrl, getApkDownloadUrl, getGhproxyExeDownloadUrl, getExeDownloadUrl } from '../lib/downloadUtils';
 
 export default function Header() {
     const [isDark, setIsDark] = useState(false);
+
+    const handleOpenUrl = (url: string) => (e: React.MouseEvent) => {
+        e.preventDefault();
+        openUrl(url);
+    };
+
+    const apkUrl = isWindows() ? getGhproxyExeDownloadUrl() : getGhproxyApkDownloadUrl();
+    const apkLabel = isWindows() ? '国内下载 EXE' : '国内下载 APK';
+    const githubUrl = isWindows() ? getExeDownloadUrl() : getApkDownloadUrl();
+    const githubLabel = isWindows() ? 'GitHub下载 EXE' : 'GitHub下载';
 
     return (
         <header className="flex flex-col border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
@@ -31,28 +44,31 @@ export default function Header() {
                     href="https://react-iztro-nine.vercel.app/"
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={handleOpenUrl('https://react-iztro-nine.vercel.app/')}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-sm rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                     <Globe size={16} />
                     官网
                 </a>
                 <a
-                    href="https://ghproxy.net/https://github.com/jingrongx/react-iztro/releases/download/v1.0.0/app-debug.apk"
+                    href={apkUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={handleOpenUrl(apkUrl)}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white text-sm rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                     <Download size={16} />
-                    国内下载 APK
+                    {apkLabel}
                 </a>
                 <a
-                    href="https://github.com/jingrongx/react-iztro/releases/download/v1.0.0/app-debug.apk"
+                    href={githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={handleOpenUrl(githubUrl)}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-900 text-white text-sm rounded-lg hover:from-gray-800 hover:to-gray-900 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                     <Github size={16} />
-                    GitHub下载
+                    {githubLabel}
                 </a>
             </div>
         </header>
