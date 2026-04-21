@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import { Iztrolabe } from 'react-iztro';
 import { astro } from 'iztro';
@@ -34,6 +34,25 @@ function App() {
   });
 
   const astrolabeRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', onFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
+    };
+  }, []);
+
+  const exitFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    }
+  }, []);
 
   const handleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -174,7 +193,7 @@ function App() {
       <Header />
       <main className="flex-1 flex flex-col md:flex-row md:overflow-hidden relative">
         <div className="flex-1 p-4 md:p-8 pb-20 md:pb-8 md:overflow-auto flex justify-center items-start md:items-center">
-          <div ref={astrolabeRef} className="astrolabe-container w-full shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-0 md:p-1">
+          <div ref={astrolabeRef} className="astrolabe-container w-full shadow-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-0 md:p-1 relative">
             <Iztrolabe
               birthday={astrolabeData.date}
               birthTime={astrolabeData.time}
@@ -183,6 +202,17 @@ function App() {
               isLeapMonth={astrolabeData.leap}
               horoscopeDate={new Date()}
             />
+            {isFullscreen && (
+              <button
+                onClick={exitFullscreen}
+                className="fixed top-4 right-4 z-50 bg-black/60 hover:bg-black/80 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-lg transition-colors"
+                title="退出全屏"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                </svg>
+              </button>
+            )}
           </div>
         </div>
         <InputForm

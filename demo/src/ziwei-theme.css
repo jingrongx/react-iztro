@@ -44,7 +44,6 @@
 /* Customizing the Astrolabe Container */
 .astrolabe-container {
     max-height: calc(100vh - 280px);
-    overflow: auto;
 }
 
 .iztro-astrolabe {
@@ -54,7 +53,7 @@
     overflow: visible;
     background-color: var(--iztro-color-bg);
     aspect-ratio: 1 / 1;
-    max-width: min(100%, calc(100vh - 280px));
+    max-height: calc(100vh - 280px);
 }
 
 .iztro-palace {
