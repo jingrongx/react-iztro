@@ -2,23 +2,12 @@ import { useState, useEffect } from 'react';
 import { X, Download, ExternalLink, RefreshCw } from 'lucide-react';
 import { openUrl } from '../lib/openUrl';
 import { isWindows } from '../lib/platformUtils';
+import { getApkDownloadUrl, getGhproxyApkDownloadUrl, getExeDownloadUrl, getGhproxyExeDownloadUrl, fetchLatestVersion } from '../lib/downloadUtils';
 
 const CURRENT_VERSION = __APP_VERSION__;
 
-const GITHUB_REPO = 'jingrongx/react-iztro';
-
-interface ReleaseInfo {
-  tag_name: string;
-  html_url: string;
-  assets: { name: string; browser_download_url: string }[];
-}
-
 const UpdateChecker: React.FC = () => {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
-  const [apkDownloadUrl, setApkDownloadUrl] = useState<string>('');
-  const [apkGhproxyUrl, setApkGhproxyUrl] = useState<string>('');
-  const [exeDownloadUrl, setExeDownloadUrl] = useState<string>('');
-  const [exeGhproxyUrl, setExeGhproxyUrl] = useState<string>('');
   const [dismissed, setDismissed] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState(false);
@@ -31,25 +20,10 @@ const UpdateChecker: React.FC = () => {
       return;
     }
 
-    const checkUpdate = async () => {
+    const loadVersion = async () => {
       try {
-        const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
-        if (!res.ok) return;
-        const data: ReleaseInfo = await res.json();
-        const remoteVersion = data.tag_name.replace(/^v/, '');
-        setLatestVersion(remoteVersion);
-
-        const apkAsset = data.assets.find(a => a.name.endsWith('.apk'));
-        const exeAsset = data.assets.find(a => a.name.endsWith('.exe'));
-
-        if (apkAsset) {
-          setApkDownloadUrl(apkAsset.browser_download_url);
-          setApkGhproxyUrl(`https://ghproxy.net/${apkAsset.browser_download_url}`);
-        }
-        if (exeAsset) {
-          setExeDownloadUrl(exeAsset.browser_download_url);
-          setExeGhproxyUrl(`https://ghproxy.net/${exeAsset.browser_download_url}`);
-        }
+        const v = await fetchLatestVersion();
+        if (v) setLatestVersion(v);
       } catch (err) {
         console.error('检查更新失败:', err);
         setError(true);
@@ -58,40 +32,11 @@ const UpdateChecker: React.FC = () => {
       }
     };
 
-    const lastCheck = localStorage.getItem('iztro_last_update_check');
     const lastDismissed = localStorage.getItem('iztro_dismissed_version');
-    if (lastDismissed) {
-      setDismissed(true);
-    }
+    if (lastDismissed) setDismissed(true);
 
-    const now = Date.now();
-    if (!lastCheck || now - parseInt(lastCheck) > 4 * 60 * 60 * 1000) {
-      checkUpdate();
-      localStorage.setItem('iztro_last_update_check', now.toString());
-    } else {
-      const cached = localStorage.getItem('iztro_latest_version');
-      if (cached) setLatestVersion(cached);
-      const cachedApkUrl = localStorage.getItem('iztro_apk_download_url');
-      if (cachedApkUrl) setApkDownloadUrl(cachedApkUrl);
-      const cachedApkProxy = localStorage.getItem('iztro_apk_ghproxy_url');
-      if (cachedApkProxy) setApkGhproxyUrl(cachedApkProxy);
-      const cachedExeUrl = localStorage.getItem('iztro_exe_download_url');
-      if (cachedExeUrl) setExeDownloadUrl(cachedExeUrl);
-      const cachedExeProxy = localStorage.getItem('iztro_exe_ghproxy_url');
-      if (cachedExeProxy) setExeGhproxyUrl(cachedExeProxy);
-      setChecking(false);
-    }
+    loadVersion();
   }, []);
-
-  useEffect(() => {
-    if (latestVersion) {
-      localStorage.setItem('iztro_latest_version', latestVersion);
-      localStorage.setItem('iztro_apk_download_url', apkDownloadUrl);
-      localStorage.setItem('iztro_apk_ghproxy_url', apkGhproxyUrl);
-      localStorage.setItem('iztro_exe_download_url', exeDownloadUrl);
-      localStorage.setItem('iztro_exe_ghproxy_url', exeGhproxyUrl);
-    }
-  }, [latestVersion, apkDownloadUrl, apkGhproxyUrl, exeDownloadUrl, exeGhproxyUrl]);
 
   const hasUpdate = !checking && !!latestVersion && latestVersion > CURRENT_VERSION;
   const showBanner = hasUpdate && !(dismissed && localStorage.getItem('iztro_dismissed_version') === latestVersion);
@@ -105,7 +50,8 @@ const UpdateChecker: React.FC = () => {
     setChecking(true);
     setError(false);
     setLatestVersion(null);
-    localStorage.removeItem('iztro_last_update_check');
+    localStorage.removeItem('iztro_latest_version');
+    localStorage.removeItem('iztro_version_fetch_time');
     setTimeout(() => window.location.reload(), 300);
   };
 
@@ -117,18 +63,13 @@ const UpdateChecker: React.FC = () => {
       console.error('下载打开失败:', err);
       try {
         const newWindow = window.open(url, '_blank');
-        if (!newWindow) {
-          window.location.href = url;
-        }
+        if (!newWindow) window.location.href = url;
       } catch (fallbackError) {
         console.error('回退方法也失败:', fallbackError);
         window.location.href = url;
       }
     }
   };
-
-  const ghproxyUrl = isWindows() ? exeGhproxyUrl : apkGhproxyUrl;
-  const downloadUrl = isWindows() ? exeDownloadUrl : apkDownloadUrl;
 
   if (!isTauriEnv) {
     return (
@@ -138,9 +79,16 @@ const UpdateChecker: React.FC = () => {
     );
   }
 
+  const ghproxyUrl = latestVersion
+    ? (isWindows() ? getGhproxyExeDownloadUrl(latestVersion) : getGhproxyApkDownloadUrl(latestVersion))
+    : '';
+  const downloadUrl = latestVersion
+    ? (isWindows() ? getExeDownloadUrl(latestVersion) : getApkDownloadUrl(latestVersion))
+    : '';
+
   return (
     <>
-      {showBanner && (
+      {showBanner && latestVersion && (
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2.5 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-2 min-w-0">
             <Download className="w-4 h-4 shrink-0" />
