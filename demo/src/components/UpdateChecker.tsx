@@ -24,6 +24,11 @@ const UpdateChecker: React.FC = () => {
   const isTauriEnv = '__TAURI__' in window || '__TAURI_INTERNALS__' in window;
 
   useEffect(() => {
+    if (!isTauriEnv) {
+      setChecking(false);
+      return;
+    }
+
     const checkUpdate = async () => {
       try {
         const res = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
@@ -116,9 +121,17 @@ const UpdateChecker: React.FC = () => {
     }
   };
 
+  if (!isTauriEnv) {
+    return (
+      <div className="text-center text-xs text-gray-400 py-2 px-4">
+        v{CURRENT_VERSION}
+      </div>
+    );
+  }
+
   return (
     <>
-      {showBanner && !isTauriEnv && (
+      {showBanner && (
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2.5 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-2 min-w-0">
             <Download className="w-4 h-4 shrink-0" />
