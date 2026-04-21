@@ -1,15 +1,30 @@
 import { Moon, Sun, Globe, Download, Monitor } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { openUrl } from '../lib/openUrl';
-import { getLatestGhproxyApkDownloadUrl, getLatestApkDownloadUrl, getLatestGhproxyExeDownloadUrl, getLatestExeDownloadUrl } from '../lib/downloadUtils';
+import { getLatestApkDownloadUrl, getLatestExeDownloadUrl, getGhproxyApkDownloadUrl, getGhproxyExeDownloadUrl, fetchLatestVersion } from '../lib/downloadUtils';
 
 export default function Header() {
     const [isDark, setIsDark] = useState(false);
+    const [latestVersion, setLatestVersion] = useState<string | null>(null);
+
+    useEffect(() => {
+        const cached = localStorage.getItem('iztro_latest_version');
+        if (cached) setLatestVersion(cached);
+        fetchLatestVersion().then(v => {
+            if (v) {
+                setLatestVersion(v);
+                localStorage.setItem('iztro_latest_version', v);
+            }
+        });
+    }, []);
 
     const handleOpenUrl = (url: string) => (e: React.MouseEvent) => {
         e.preventDefault();
         openUrl(url);
     };
+
+    const apkGhproxyUrl = latestVersion ? getGhproxyApkDownloadUrl(latestVersion) : getLatestApkDownloadUrl();
+    const exeGhproxyUrl = latestVersion ? getGhproxyExeDownloadUrl(latestVersion) : getLatestExeDownloadUrl();
 
     return (
         <header className="flex flex-col border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
@@ -36,20 +51,20 @@ export default function Header() {
             <div className="px-6 pb-4 space-y-3">
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                     <a
-                        href={getLatestGhproxyApkDownloadUrl()}
+                        href={apkGhproxyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenUrl(getLatestGhproxyApkDownloadUrl())}
+                        onClick={handleOpenUrl(apkGhproxyUrl)}
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium"
                     >
                         <Download size={18} />
                         Android下载
                     </a>
                     <a
-                        href={getLatestGhproxyExeDownloadUrl()}
+                        href={exeGhproxyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenUrl(getLatestGhproxyExeDownloadUrl())}
+                        onClick={handleOpenUrl(exeGhproxyUrl)}
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium"
                     >
                         <Monitor size={18} />
