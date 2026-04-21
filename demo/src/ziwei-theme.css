@@ -42,6 +42,11 @@
 }
 
 /* Customizing the Astrolabe Container */
+.astrolabe-container {
+    max-height: calc(100vh - 280px);
+    overflow: auto;
+}
+
 .iztro-astrolabe {
     font-family: 'Inter', system-ui, sans-serif;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -49,6 +54,7 @@
     overflow: visible;
     background-color: var(--iztro-color-bg);
     aspect-ratio: 1 / 1;
+    max-width: min(100%, calc(100vh - 280px));
 }
 
 .iztro-palace {
