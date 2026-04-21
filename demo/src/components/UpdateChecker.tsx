@@ -15,8 +15,10 @@ interface ReleaseInfo {
 
 const UpdateChecker: React.FC = () => {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
-  const [downloadUrl, setDownloadUrl] = useState<string>('');
-  const [ghproxyUrl, setGhproxyUrl] = useState<string>('');
+  const [apkDownloadUrl, setApkDownloadUrl] = useState<string>('');
+  const [apkGhproxyUrl, setApkGhproxyUrl] = useState<string>('');
+  const [exeDownloadUrl, setExeDownloadUrl] = useState<string>('');
+  const [exeGhproxyUrl, setExeGhproxyUrl] = useState<string>('');
   const [dismissed, setDismissed] = useState(false);
   const [checking, setChecking] = useState(true);
   const [error, setError] = useState(false);
@@ -40,15 +42,13 @@ const UpdateChecker: React.FC = () => {
         const apkAsset = data.assets.find(a => a.name.endsWith('.apk'));
         const exeAsset = data.assets.find(a => a.name.endsWith('.exe'));
 
-        if (isWindows() && exeAsset) {
-          setDownloadUrl(exeAsset.browser_download_url);
-          setGhproxyUrl(`https://ghproxy.net/${exeAsset.browser_download_url}`);
-        } else if (apkAsset) {
-          setDownloadUrl(apkAsset.browser_download_url);
-          setGhproxyUrl(`https://ghproxy.net/${apkAsset.browser_download_url}`);
-        } else {
-          setDownloadUrl(data.html_url);
-          setGhproxyUrl(data.html_url);
+        if (apkAsset) {
+          setApkDownloadUrl(apkAsset.browser_download_url);
+          setApkGhproxyUrl(`https://ghproxy.net/${apkAsset.browser_download_url}`);
+        }
+        if (exeAsset) {
+          setExeDownloadUrl(exeAsset.browser_download_url);
+          setExeGhproxyUrl(`https://ghproxy.net/${exeAsset.browser_download_url}`);
         }
       } catch (err) {
         console.error('检查更新失败:', err);
@@ -71,10 +71,14 @@ const UpdateChecker: React.FC = () => {
     } else {
       const cached = localStorage.getItem('iztro_latest_version');
       if (cached) setLatestVersion(cached);
-      const cachedUrl = localStorage.getItem('iztro_download_url');
-      if (cachedUrl) setDownloadUrl(cachedUrl);
-      const cachedProxy = localStorage.getItem('iztro_ghproxy_url');
-      if (cachedProxy) setGhproxyUrl(cachedProxy);
+      const cachedApkUrl = localStorage.getItem('iztro_apk_download_url');
+      if (cachedApkUrl) setApkDownloadUrl(cachedApkUrl);
+      const cachedApkProxy = localStorage.getItem('iztro_apk_ghproxy_url');
+      if (cachedApkProxy) setApkGhproxyUrl(cachedApkProxy);
+      const cachedExeUrl = localStorage.getItem('iztro_exe_download_url');
+      if (cachedExeUrl) setExeDownloadUrl(cachedExeUrl);
+      const cachedExeProxy = localStorage.getItem('iztro_exe_ghproxy_url');
+      if (cachedExeProxy) setExeGhproxyUrl(cachedExeProxy);
       setChecking(false);
     }
   }, []);
@@ -82,10 +86,12 @@ const UpdateChecker: React.FC = () => {
   useEffect(() => {
     if (latestVersion) {
       localStorage.setItem('iztro_latest_version', latestVersion);
-      localStorage.setItem('iztro_download_url', downloadUrl);
-      localStorage.setItem('iztro_ghproxy_url', ghproxyUrl);
+      localStorage.setItem('iztro_apk_download_url', apkDownloadUrl);
+      localStorage.setItem('iztro_apk_ghproxy_url', apkGhproxyUrl);
+      localStorage.setItem('iztro_exe_download_url', exeDownloadUrl);
+      localStorage.setItem('iztro_exe_ghproxy_url', exeGhproxyUrl);
     }
-  }, [latestVersion, downloadUrl, ghproxyUrl]);
+  }, [latestVersion, apkDownloadUrl, apkGhproxyUrl, exeDownloadUrl, exeGhproxyUrl]);
 
   const hasUpdate = !checking && !!latestVersion && latestVersion > CURRENT_VERSION;
   const showBanner = hasUpdate && !(dismissed && localStorage.getItem('iztro_dismissed_version') === latestVersion);
@@ -120,6 +126,9 @@ const UpdateChecker: React.FC = () => {
       }
     }
   };
+
+  const ghproxyUrl = isWindows() ? exeGhproxyUrl : apkGhproxyUrl;
+  const downloadUrl = isWindows() ? exeDownloadUrl : apkDownloadUrl;
 
   if (!isTauriEnv) {
     return (

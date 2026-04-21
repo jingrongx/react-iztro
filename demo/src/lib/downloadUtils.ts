@@ -1,15 +1,13 @@
-const version = __APP_VERSION__;
-
 const GITHUB_REPO = 'jingrongx/react-iztro';
 
-export const getApkDownloadUrl = () =>
-  `https://github.com/${GITHUB_REPO}/releases/download/v${version}/react-iztro_v${version}.apk`;
+export const getLatestApkDownloadUrl = () =>
+  `https://github.com/${GITHUB_REPO}/releases/latest/download/react-iztro.apk`;
 
-export const getGhproxyApkDownloadUrl = () =>
-  `https://ghproxy.net/https://github.com/${GITHUB_REPO}/releases/download/v${version}/react-iztro_v${version}.apk`;
+export const getLatestGhproxyApkDownloadUrl = () =>
+  `https://ghproxy.net/https://github.com/${GITHUB_REPO}/releases/latest/download/react-iztro.apk`;
 
-export const getExeDownloadUrl = () =>
-  `https://github.com/${GITHUB_REPO}/releases/download/v${version}/react-iztro_${version}_x64-setup.exe`;
+export const getLatestExeDownloadUrl = () =>
+  `https://github.com/${GITHUB_REPO}/releases/latest/download/react-iztro_x64-setup.exe`;
 
-export const getGhproxyExeDownloadUrl = () =>
-  `https://ghproxy.net/https://github.com/${GITHUB_REPO}/releases/download/v${version}/react-iztro_${version}_x64-setup.exe`;
+export const getLatestGhproxyExeDownloadUrl = () =>
+  `https://ghproxy.net/https://github.com/${GITHUB_REPO}/releases/latest/download/react-iztro_x64-setup.exe`;

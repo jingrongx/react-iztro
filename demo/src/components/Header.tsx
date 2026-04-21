@@ -1,7 +1,7 @@
 import { Moon, Sun, Globe, Download, Monitor } from 'lucide-react';
 import { useState } from 'react';
 import { openUrl } from '../lib/openUrl';
-import { getGhproxyApkDownloadUrl, getApkDownloadUrl, getGhproxyExeDownloadUrl, getExeDownloadUrl } from '../lib/downloadUtils';
+import { getLatestGhproxyApkDownloadUrl, getLatestApkDownloadUrl, getLatestGhproxyExeDownloadUrl, getLatestExeDownloadUrl } from '../lib/downloadUtils';
 
 export default function Header() {
     const [isDark, setIsDark] = useState(false);
@@ -36,20 +36,20 @@ export default function Header() {
             <div className="px-6 pb-4 space-y-3">
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
                     <a
-                        href={getGhproxyApkDownloadUrl()}
+                        href={getLatestGhproxyApkDownloadUrl()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenUrl(getGhproxyApkDownloadUrl())}
+                        onClick={handleOpenUrl(getLatestGhproxyApkDownloadUrl())}
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg hover:from-green-600 hover:to-teal-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium"
                     >
                         <Download size={18} />
                         Android下载
                     </a>
                     <a
-                        href={getGhproxyExeDownloadUrl()}
+                        href={getLatestGhproxyExeDownloadUrl()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenUrl(getGhproxyExeDownloadUrl())}
+                        onClick={handleOpenUrl(getLatestGhproxyExeDownloadUrl())}
                         className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 shadow-md hover:shadow-lg text-sm font-medium"
                     >
                         <Monitor size={18} />
@@ -58,20 +58,20 @@ export default function Header() {
                 </div>
                 <div className="flex flex-wrap gap-x-4 gap-y-1 justify-center text-xs text-gray-500 dark:text-gray-400">
                     <a
-                        href={getApkDownloadUrl()}
+                        href={getLatestApkDownloadUrl()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenUrl(getApkDownloadUrl())}
+                        onClick={handleOpenUrl(getLatestApkDownloadUrl())}
                         className="hover:text-gray-700 dark:hover:text-gray-300 underline decoration-dotted"
                     >
                         GitHub APK
                     </a>
                     <span className="text-gray-300 dark:text-gray-600">|</span>
                     <a
-                        href={getExeDownloadUrl()}
+                        href={getLatestExeDownloadUrl()}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenUrl(getExeDownloadUrl())}
+                        onClick={handleOpenUrl(getLatestExeDownloadUrl())}
                         className="hover:text-gray-700 dark:hover:text-gray-300 underline decoration-dotted"
                     >
                         GitHub EXE
